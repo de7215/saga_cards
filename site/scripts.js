@@ -322,13 +322,14 @@ async function fetchWalletData() {
     );
 
     const userCards = Array.from(userCardsSet);
-
-    console.log(userCards);  // Debug print
     
     const bestCombinations = findBestCombinations(userCards);
     
     // Display the best combinations on the page
     displayBestCombinations(bestCombinations);
+
+    displayPassCardsInWallet(tokens);
+
   } catch (error) {
     console.error("Error fetching wallet data:", error);
     alert("An error occurred while fetching wallet data. Please try again.");
@@ -356,6 +357,99 @@ function clearAllHighlights() {
 
   for (const cardImage of cardImages) {
     cardImage.style.boxShadow = '';
+  }
+}
+
+
+async function getMintList(verifiedCollectionAddress) {
+  const url = `https://rpc-proxy.de7215.workers.dev/v1/mintlist`;
+  let data = {
+    query: {
+      verifiedCollectionAddresses: [verifiedCollectionAddress],
+    },
+    options: {
+      limit: 10000,
+    },
+  };
+  let mintList = [];
+  try {
+    while (true) {
+      let result = await jsonQuery(data, url);
+      mintList = mintList.concat(result.result);
+      if (!result.paginationToken) {
+        break;
+      }
+      data.options.paginationToken = result.paginationToken;
+    }
+  } catch (error) {
+    console.error('An error occurred while fetching the mint list:', error.message);
+  }
+  const mints = mintList.map(item => item.mint);
+  return mints;
+}
+
+async function jsonQuery(data, url) {
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`An error occurred: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('An error occurred while making the HTTP request:', error.message);
+    throw error;
+  }
+}
+
+async function displayPassCardsInWallet(tokens) {
+  passCardNftMintList = await getMintList('saga8uJYtWyHZ7spe4RVUA5eutbZPQYZe6D9uCkVK6r');
+
+  const filteredTokens = tokens.filter(token => passCardNftMintList.includes(token.mint));
+
+  const userPassInfo = document.getElementById('user-pass-info');
+  userPassInfo.innerHTML = '';
+
+  if (filteredTokens.length > 0) {
+    const passFoundMessage = document.createElement('div');
+    passFoundMessage.className = 'pass-found-message';
+    passFoundMessage.textContent = `${filteredTokens.length} Saga pass NFTs found (click to expand)`;
+    userPassInfo.appendChild(passFoundMessage);
+
+    const passCardList = document.createElement('ul');
+    passCardList.hidden = true; // Hide the list by default
+
+    passCardList.className = 'pass-card-list';
+    filteredTokens.forEach(token => {
+      const passCardItem = document.createElement('li');
+      passCardItem.className = 'pass-card-item';
+      const passCardLink = document.createElement('a');
+      passCardLink.href = `https://explorer.solana.com/address//${token.mint}`;
+      passCardLink.textContent = `${token.mint}`;
+      passCardLink.target = '_blank'; // Open the link in a new tab
+      passCardItem.appendChild(passCardLink);
+      passCardList.appendChild(passCardItem);
+    });
+
+
+    userPassInfo.appendChild(passCardList);
+
+    passFoundMessage.addEventListener('click', () => {
+      passCardList.hidden = !passCardList.hidden;
+    });
+  } else {
+    // Create and display the warning message
+    const warningMessage = document.createElement('div');
+    warningMessage.className = 'warning-message';
+    warningMessage.textContent = 'No Saga Pass NFT found - This means that the discount does not apply.';
+    userPassInfo.appendChild(warningMessage);
   }
 }
 

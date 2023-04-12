@@ -191,3 +191,57 @@ tr:not(:last-child) {
   border-bottom: 1px solid #145fcf;
 }
 
+.warning-message {
+  color: red;
+  font-size: 24px;           /* Adjust the font size */
+  font-weight: bold;         /* Make the text bold */
+  border: 2px solid red;     /* Add a border */
+  padding: 10px;             /* Add some padding */
+  background-color: #ffe6e6; /* Add a light red background color */
+  border-radius: 5px;        /* Round the corners */
+  width: auto;               /* Adjust the width */
+  text-align: center;        /* Center the text */
+  margin: 10px auto;         /* Add some margin and center the element */
+}
+
+/* Specific styles for pass-card-table */
+.user-pass-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.pass-found-message {
+  color: green;
+  font-size: 24px;           /* Adjust the font size */
+  font-weight: bold;         /* Make the text bold */
+  border: 2px solid green;     /* Add a border */
+  padding: 10px;             /* Add some padding */
+  background-color: #eeffe6; /* Add a light red background color */
+  border-radius: 5px;        /* Round the corners */
+  width: auto;               /* Adjust the width */
+  text-align: center;        /* Center the text */
+  margin: 10px auto;         /* Add some margin and center the element */
+  cursor: pointer;
+}
+
+.user-pass-info {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.pass-card-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.pass-card-item {
+  margin-bottom: 5px;
+}
+
+.hidden {
+  display: none;
+}
